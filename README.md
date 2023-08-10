@@ -1,12 +1,12 @@
-# NLP Transformer Model of TensorFlow 2
+# Transformer-based Language Translation Model with TensorFlow 2
 
 ## Environment
 
 Install TensorFlow 2.0 and other dependencies:
 
 ```bash
-# CUDA 11.8 + cuDNN 8.6 + Python 3.10
-conda env create -f conda-cu11-py310.yaml
+# CUDA 12.1 + cuDNN 8.9 + Python 3.11
+conda env create -f conda-cu12-py311.yaml
 # Apple Silicon + Python 3.11
 conda env create -f conda-apple-py311.yaml
 ```
@@ -14,7 +14,7 @@ conda env create -f conda-apple-py311.yaml
 Uninstall:
 
 ```bash
-conda env remove --name py311-apple-tftrans
+conda env remove --name py311-apple-tftxtrans
 ```
 
 Note that environment variables such as `LD_LIBRARY_PATH` must be set properly

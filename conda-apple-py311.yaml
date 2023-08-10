@@ -1,4 +1,4 @@
-name: py311-apple-tftrans
+name: py311-apple-tftxtrans
 channels:
   - apple
   - conda-forge
@@ -6,9 +6,10 @@ dependencies:
   - python=3.11.3
   - pip>=23.1.0
   - pip:
-    - tensorflow-macos>=2.12.0
+    - tensorflow-macos>=2.13.0
     - tensorflow-metal>=1.0.0
     - tensorflow-datasets>=4.9.2
+    - transformers>=4.31.0
     - click>=8.1.3
     - ruff>=0.0.271
     - yapf>=0.33.0
