@@ -48,6 +48,15 @@ class Config:
     # folders
     MODELDIR = os.path.join(rootdir, "model_config")
 
+    VOCAB_SIZE = 32000  # vocabulary size
+    SEQ_LEN = 128  # maximum length of a sequence
+    N_LAYER = 6  # number of layers
+    N_HEAD = 8  # number of heads
+    D_MODEL = 512  # embedding size
+    D_FF = D_MODEL * 4  # dimension of feed forward
+    D_MHA = D_MODEL // N_HEAD  # dimension of multi-head attention
+    DROP_RATE = 0.1  # dropout rate
+
 
 class TestConfig(Config):
     """Provide Testing Configuration."""
