@@ -62,12 +62,3 @@ def embedding(x: tf.Tensor, vocab_size: int, depth: int) -> tf.Tensor:
     pos_enc = wpe(seq_len, depth)
     x = wte(x, vocab_size, depth)
     return x + pos_enc
-
-
-if __name__ == "__main__":
-    pos_encoding = wpe(50, 4)
-    print(pos_encoding)
-
-    x = tf.random.uniform(shape=(64, 40), maxval=31000, dtype=tf.int32)
-    y = embedding(x, 31000, 512)
-    print(y)

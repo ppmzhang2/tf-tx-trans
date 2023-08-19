@@ -11,7 +11,6 @@ TKR_EN_NAME = "bert-base-uncased"
 
 # Dataset parameters
 BUFFER_SIZE = 20000
-BATCH_SIZE = 64
 SLICE_CTX = slice(0, cfg.SEQ_LEN)
 SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)
 
@@ -128,12 +127,12 @@ def make_batch(
             to_ragged,
             num_parallel_calls=tf.data.AUTOTUNE,
         ).batch(
-            BATCH_SIZE,
+            cfg.BATCH_SIZE,
             drop_remainder=True,
         ).prefetch(tf.data.AUTOTUNE)
 
     return res.padded_batch(
-        BATCH_SIZE,
+        cfg.BATCH_SIZE,
         padded_shapes=([None], [None], [None]),
         padding_values=(0, 0, 0),
         drop_remainder=True,
@@ -172,18 +171,3 @@ def id2txt_en(ids_en: tf.Tensor) -> str:
     tkr_en = get_tkr(TKR_EN_NAME)
     txt_en = tkr_en.decode(ids_en, skip_special_tokens=True)
     return txt_en
-
-
-if __name__ == "__main__":
-    train_data, val_data, _ = load_train_valid(ragged=False)
-    for pt, en, lbl in train_data.take(1).cache():
-        print(pt.shape)
-        print(en.shape)
-        print(lbl.shape)
-
-    ids_en = tf.constant(
-        [101, 2021, 2054, 2065, 2009, 2020, 3161, 1029, 102],
-        dtype=tf.int32,
-    )
-    txt_en = id2txt_en(ids_en)
-    print(txt_en)

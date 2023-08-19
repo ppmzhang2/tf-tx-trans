@@ -29,6 +29,6 @@ lint:
 
 .PHONY: test
 test:
-	PYTHONPATH=. \
-	    pytest -s -v --cov=app --cov-config=pyproject.toml \
+	PYTHONPATH=./src \
+	    pytest -s -v --cov=trans --cov-config=pyproject.toml \
 	    > coverage.txt
