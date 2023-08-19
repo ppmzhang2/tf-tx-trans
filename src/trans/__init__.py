@@ -1,7 +1,7 @@
 """Project init."""
 import os
 
-from rcnn import config
+from trans import config
 
 env = os.getenv("ENV", "test")
 

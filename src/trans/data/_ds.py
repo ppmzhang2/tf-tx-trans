@@ -3,6 +3,8 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 from transformers import BertTokenizer
 
+from trans import cfg
+
 # BPE tokenizers from HuggingFace
 TKR_PT_NAME = "neuralmind/bert-base-portuguese-cased"
 TKR_EN_NAME = "bert-base-uncased"
@@ -10,9 +12,8 @@ TKR_EN_NAME = "bert-base-uncased"
 # Dataset parameters
 BUFFER_SIZE = 20000
 BATCH_SIZE = 64
-SEQ_LEN = 40
-SLICE_CTX = slice(0, SEQ_LEN)
-SLICE_LBL = slice(1, SEQ_LEN + 1)
+SLICE_CTX = slice(0, cfg.SEQ_LEN)
+SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)
 
 
 def get_tkr(name: str) -> BertTokenizer:
@@ -25,6 +26,7 @@ def encode_txt(
     en: tf.Tensor,
     pt_tkr: BertTokenizer,
     en_tkr: BertTokenizer,
+    *,
     integer: bool,
 ) -> tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
     """Encode Portuguese-English text to either token IDs or string tokens.
@@ -93,6 +95,7 @@ def make_batch(
     ds: tf.data.Dataset,
     pt_tkr: BertTokenizer,
     en_tkr: BertTokenizer,
+    *,
     integer: bool,
     ragged: bool,
 ) -> tf.data.Dataset:
@@ -113,7 +116,7 @@ def make_batch(
         pt: tf.Tensor,
         en: tf.Tensor,
     ) -> tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
-        return encode_txt(pt, en, pt_tkr, en_tkr, integer)
+        return encode_txt(pt, en, pt_tkr, en_tkr, integer=integer)
 
     res = ds.shuffle(BUFFER_SIZE).map(
         _encoder,
@@ -138,6 +141,7 @@ def make_batch(
 
 
 def load_train_valid(
+    *,
     ragged: bool = False,
 ) -> tuple[tf.data.Dataset, tf.data.Dataset, tfds.core.DatasetInfo]:
     """Load Portuguese-English translation dataset.
@@ -157,8 +161,8 @@ def load_train_valid(
     pt_tkr, en_tkr = get_tkr(TKR_PT_NAME), get_tkr(TKR_EN_NAME)
 
     return (
-        make_batch(ds_tr, pt_tkr, en_tkr, integer, ragged),
-        make_batch(ds_va, pt_tkr, en_tkr, integer, ragged),
+        make_batch(ds_tr, pt_tkr, en_tkr, integer=integer, ragged=ragged),
+        make_batch(ds_va, pt_tkr, en_tkr, integer=integer, ragged=ragged),
         info,
     )
 
@@ -171,11 +175,11 @@ def id2txt_en(ids_en: tf.Tensor) -> str:
 
 
 if __name__ == "__main__":
-    train_data, val_data, _ = load_train_valid()
+    train_data, val_data, _ = load_train_valid(ragged=False)
     for pt, en, lbl in train_data.take(1).cache():
-        print(pt)
-        print(en)
-        print(lbl)
+        print(pt.shape)
+        print(en.shape)
+        print(lbl.shape)
 
     ids_en = tf.constant(
         [101, 2021, 2054, 2065, 2009, 2020, 3161, 1029, 102],
