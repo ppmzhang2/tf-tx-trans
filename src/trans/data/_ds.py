@@ -11,7 +11,6 @@ TKR_EN_NAME = "bert-base-uncased"
 
 # Dataset parameters
 BUFFER_SIZE = 20000
-BATCH_SIZE = 64
 SLICE_CTX = slice(0, cfg.SEQ_LEN)
 SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)
 
@@ -128,12 +127,12 @@ def make_batch(
             to_ragged,
             num_parallel_calls=tf.data.AUTOTUNE,
         ).batch(
-            BATCH_SIZE,
+            cfg.BATCH_SIZE,
             drop_remainder=True,
         ).prefetch(tf.data.AUTOTUNE)
 
     return res.padded_batch(
-        BATCH_SIZE,
+        cfg.BATCH_SIZE,
         padded_shapes=([None], [None], [None]),
         padding_values=(0, 0, 0),
         drop_remainder=True,
