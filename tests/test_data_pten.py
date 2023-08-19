@@ -2,8 +2,7 @@
 import tensorflow as tf
 
 from trans import cfg
-from trans.data import id2txt_en
-from trans.data import load_train_valid
+from trans.data import pten
 
 
 def test_id2txt_en() -> None:
@@ -13,12 +12,12 @@ def test_id2txt_en() -> None:
         dtype=tf.int32,
     )
     txt_en = "but what if it were active?"
-    assert id2txt_en(ids_en) == txt_en
+    assert pten.id2txt_en(ids_en) == txt_en
 
 
 def test_load_train_valid_ragged() -> None:
     """Test `load_train_valid` function with `ragged=True`."""
-    train_data, val_data, _ = load_train_valid(ragged=True)
+    train_data, val_data, _ = pten.load_train_valid(ragged=True)
     for pt, en, lbl in train_data.take(1):
         assert pt.shape == (cfg.BATCH_SIZE, None, None)
         assert en.shape == (cfg.BATCH_SIZE, None, None)
@@ -33,7 +32,7 @@ def test_load_train_valid_ragged() -> None:
 
 def test_load_train_valid_padded() -> None:
     """Test `load_train_valid` function with `ragged=False`."""
-    train_data, val_data, _ = load_train_valid(ragged=False)
+    train_data, val_data, _ = pten.load_train_valid(ragged=False)
     for pt, en, lbl in train_data.take(1):
         assert pt.shape[0] == cfg.BATCH_SIZE
         assert en.shape[0] == cfg.BATCH_SIZE

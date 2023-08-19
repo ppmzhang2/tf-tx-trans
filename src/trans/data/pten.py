@@ -1,4 +1,4 @@
-"""Dataset prcoessing for Portuguese-English translation task."""
+"""Loaders for translation dataset from Portuguese to English in plain text."""
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from transformers import BertTokenizer
@@ -10,9 +10,14 @@ TKR_PT_NAME = "neuralmind/bert-base-portuguese-cased"
 TKR_EN_NAME = "bert-base-uncased"
 
 # Dataset parameters
-BUFFER_SIZE = 20000
-SLICE_CTX = slice(0, cfg.SEQ_LEN)
-SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)
+N_OBS_TR = 51785  # number of training observations
+N_OBS_VA = 1193  # number of validation observations
+N_OBS_TE = 1803  # number of test observations
+
+# internal parameters
+_BUFFER_SIZE = 20000  # buffer size for shuffling
+_SLICE_CTX = slice(0, cfg.SEQ_LEN)  # slice for EN (query) and PT (context)
+_SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)  # slice for EN (label)
 
 
 def get_tkr(name: str) -> BertTokenizer:
@@ -51,7 +56,7 @@ def encode_txt(
                                add_special_tokens=True)
         en_ids = en_tkr.encode(en.numpy().decode("utf-8"),
                                add_special_tokens=True)
-        return pt_ids[SLICE_CTX], en_ids[SLICE_CTX], en_ids[SLICE_LBL]
+        return pt_ids[_SLICE_CTX], en_ids[_SLICE_CTX], en_ids[_SLICE_LBL]
 
     def _txt2tk(
         pt: tf.Tensor,
@@ -59,7 +64,8 @@ def encode_txt(
     ) -> tuple[list[str], list[str], list[str]]:
         pt_tokens = pt_tkr.tokenize(pt.numpy().decode("utf-8"))
         en_tokens = en_tkr.tokenize(en.numpy().decode("utf-8"))
-        return pt_tokens[SLICE_CTX], en_tokens[SLICE_CTX], en_tokens[SLICE_LBL]
+        return pt_tokens[_SLICE_CTX], en_tokens[_SLICE_CTX], en_tokens[
+            _SLICE_LBL]
 
     if integer:
         return tf.py_function(_txt2id, [pt, en],
@@ -117,7 +123,7 @@ def make_batch(
     ) -> tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         return encode_txt(pt, en, pt_tkr, en_tkr, integer=integer)
 
-    res = ds.shuffle(BUFFER_SIZE).map(
+    res = ds.shuffle(_BUFFER_SIZE).map(
         _encoder,
         num_parallel_calls=tf.data.AUTOTUNE,
     )
