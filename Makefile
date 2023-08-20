@@ -24,7 +24,7 @@ format:
 .PHONY: lint
 ## pylint check
 lint:
-	ruff check src/rcnn --show-source --show-fixes \
+	ruff check src/trans --show-source --show-fixes \
 	    --exit-zero
 
 .PHONY: test

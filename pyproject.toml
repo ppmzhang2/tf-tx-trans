@@ -23,10 +23,10 @@ classifiers = [
 ]
 
 [project.urls]
-homepage = "https://github.com/ppmzhang2/tf-rcnn"
+homepage = "https://github.com/ppmzhang2/tf-tx-trans"
 
 [project.scripts]
-tf-rcnn = "trans.cli:cli"
+tf-tx-trans = "trans.cli:cli"
 
 [project.optional-dependencies]
 repl = [
