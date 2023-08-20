@@ -25,3 +25,9 @@ set -Ux CUDNN_PATH $CONDA_PREFIX/lib/python3.1/site-packages/nvidia/cudnn
 set -Ux LD_LIBRARY_PATH $LD_LIBRARY_PATH $CONDA_PREFIX/lib $CUDNN_PATH/lib
 set -Ux XLA_FLAGS --xla_gpu_cuda_data_dir=$CONDA_PREFIX
 ```
+
+## References
+
+- [The Original Transformer Paper](https://arxiv.org/abs/1706.03762)
+- The well documented TensorFlow
+  [Transformer Tutorial](https://www.tensorflow.org/text/tutorials/transformer)
