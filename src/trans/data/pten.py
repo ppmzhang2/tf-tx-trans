@@ -18,11 +18,44 @@ N_OBS_TE = 1803  # number of test observations
 _BUFFER_SIZE = 20000  # buffer size for shuffling
 _SLICE_CTX = slice(0, cfg.SEQ_LEN)  # slice for EN (query) and PT (context)
 _SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)  # slice for EN (label)
+_EN_BEG_TKN = "[CLS]"  # begin token for English
+_EN_END_TKN = "[SEP]"  # end token for English
+_EN_BEG_ID = 101  # begin token ID for English
+_EN_END_ID = 102  # end token ID for English
 
 
 def get_tkr(name: str) -> BertTokenizer:
     """Load BPE tokenizer for Portuguese-English translation task."""
     return BertTokenizer.from_pretrained(name)
+
+
+def trunc_pad(
+    pt: list,
+    en: list,
+    lab: list,
+    *,
+    integer: bool = True,
+) -> tuple[list, list, list]:
+    """Truncate and pad with begin and end tokens.
+
+    - PT (context): truncate to `SEQ_LEN`, no padding or adding special tokens
+    - EN (query): truncate to `SEQ_LEN`, add begin token
+    - EN (label): truncate to `SEQ_LEN`, add end token
+
+    Args:
+        pt (list): PT context.
+        en (list): EN query.
+        lab (list): EN label.
+        integer (bool, optional): whether integer IDs or string tokens.
+
+    Returns:
+        tuple[list, list, list]: truncated and padded PT context, EN query,
+            and EN label.
+    """
+    beg_ = _EN_BEG_ID if integer else _EN_BEG_TKN
+    end_ = _EN_END_ID if integer else _EN_END_TKN
+    pt_, en_, lab_, = pt[:cfg.SEQ_LEN], en[:cfg.SEQ_LEN], lab[:cfg.SEQ_LEN]
+    return pt_, [beg_, *en_], [*lab_, end_]
 
 
 def encode_txt(
@@ -53,10 +86,10 @@ def encode_txt(
         en: tf.Tensor,
     ) -> tuple[list[int], list[int], list[int]]:
         pt_ids = pt_tkr.encode(pt.numpy().decode("utf-8"),
-                               add_special_tokens=True)
+                               add_special_tokens=False)
         en_ids = en_tkr.encode(en.numpy().decode("utf-8"),
-                               add_special_tokens=True)
-        return pt_ids[_SLICE_CTX], en_ids[_SLICE_CTX], en_ids[_SLICE_LBL]
+                               add_special_tokens=False)
+        return trunc_pad(pt_ids, en_ids, en_ids, integer=True)
 
     def _txt2tk(
         pt: tf.Tensor,
@@ -64,8 +97,7 @@ def encode_txt(
     ) -> tuple[list[str], list[str], list[str]]:
         pt_tokens = pt_tkr.tokenize(pt.numpy().decode("utf-8"))
         en_tokens = en_tkr.tokenize(en.numpy().decode("utf-8"))
-        return pt_tokens[_SLICE_CTX], en_tokens[_SLICE_CTX], en_tokens[
-            _SLICE_LBL]
+        return trunc_pad(pt_tokens, en_tokens, en_tokens, integer=False)
 
     if integer:
         return tf.py_function(_txt2id, [pt, en],
