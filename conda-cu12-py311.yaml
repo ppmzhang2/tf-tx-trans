@@ -1,4 +1,4 @@
-name: py311-cu12-tfrcnn
+name: py311-cu12-tftxtrans
 channels:
   - conda-forge
   - nvidia
