@@ -16,8 +16,8 @@ N_OBS_TE = 1803  # number of test observations
 
 # internal parameters
 _BUFFER_SIZE = 20000  # buffer size for shuffling
-_SLICE_CTX = slice(0, cfg.SEQ_LEN)  # slice for EN (query) and PT (context)
-_SLICE_LBL = slice(1, cfg.SEQ_LEN + 1)  # slice for EN (label)
+_SLICE_PT = slice(0, cfg.SEQ_LEN - 1)  # totally 127 elements
+_SLICE_EN = slice(1, cfg.SEQ_LEN)  # totally 127 elements
 _EN_BEG_TKN = "[CLS]"  # begin token for English
 _EN_END_TKN = "[SEP]"  # end token for English
 _EN_BEG_ID = 101  # begin token ID for English
@@ -54,7 +54,7 @@ def trunc_pad(
     """
     beg_ = _EN_BEG_ID if integer else _EN_BEG_TKN
     end_ = _EN_END_ID if integer else _EN_END_TKN
-    pt_, en_, lab_, = pt[:cfg.SEQ_LEN], en[:cfg.SEQ_LEN], lab[:cfg.SEQ_LEN]
+    pt_, en_, lab_, = pt[_SLICE_PT], en[_SLICE_EN], lab[_SLICE_EN]
     return pt_, [beg_, *en_], [*lab_, end_]
 
 
@@ -171,7 +171,7 @@ def make_batch(
 
     return res.padded_batch(
         cfg.BATCH_SIZE,
-        padded_shapes=([None], [None], [None]),
+        padded_shapes=([cfg.SEQ_LEN], [cfg.SEQ_LEN], [cfg.SEQ_LEN]),
         padding_values=(0, 0, 0),
         drop_remainder=True,
     ).prefetch(tf.data.AUTOTUNE)

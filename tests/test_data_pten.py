@@ -34,12 +34,12 @@ def test_load_train_valid_padded() -> None:
     """Test `load_train_valid` function with `ragged=False`."""
     train_data, val_data, _ = pten.load_train_valid(ragged=False)
     for pt, en, lbl in train_data.take(1):
-        assert pt.shape[0] == cfg.BATCH_SIZE
-        assert en.shape[0] == cfg.BATCH_SIZE
-        assert lbl.shape[0] == cfg.BATCH_SIZE
-        assert pt.shape[1] <= cfg.SEQ_LEN
-        assert en.shape[1] <= cfg.SEQ_LEN
-        assert lbl.shape[1] <= cfg.SEQ_LEN
+        assert pt.shape == (cfg.BATCH_SIZE, cfg.SEQ_LEN)
+        assert en.shape == (cfg.BATCH_SIZE, cfg.SEQ_LEN)
+        assert lbl.shape == (cfg.BATCH_SIZE, cfg.SEQ_LEN)
+        assert pt.shape[1] == cfg.SEQ_LEN
+        assert en.shape[1] == cfg.SEQ_LEN
+        assert lbl.shape[1] == cfg.SEQ_LEN
         assert tf.reduce_max(pt) <= cfg.VOCAB
         assert tf.reduce_max(en) <= cfg.VOCAB
         assert tf.reduce_max(lbl) <= cfg.VOCAB
