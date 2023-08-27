@@ -44,21 +44,26 @@ def wte(x: tf.Tensor, vocab_size: int, depth: int) -> tf.Tensor:
     return tf.keras.layers.Embedding(vocab_size, depth)(x)
 
 
-def embedding(x: tf.Tensor, vocab_size: int, depth: int) -> tf.Tensor:
+def embedding(
+    x: tf.Tensor,
+    vocab_size: int,
+    seq_len: int,
+    depth: int,
+) -> tf.Tensor:
     """Input Embedding.
 
     This function is used to encode each token in the sequence into a vector,
     and then add the positional encoding to each token.
 
     Args:
-        x: Token ID sequence tensor of shape (batch, seq).
-        vocab_size: Vocabulary size.
-        depth: Embedding depth.
+        x (tf.Tensor): Token ID sequence tensor of shape (batch, seq).
+        vocab_size (int): Vocabulary size.
+        seq_len (int): Sequence length.
+        depth (int): Embedding depth.
 
     Returns:
         tf.Tensor: Embedding tensor of shape (batch, seq, depth).
     """
-    seq_len = tf.shape(x)[1]
     pos_enc = wpe(seq_len, depth)
     x = wte(x, vocab_size, depth)
     return x + pos_enc

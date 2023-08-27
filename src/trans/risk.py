@@ -17,7 +17,7 @@ def risk_cce(lab: tf.Tensor, prd: tf.Tensor) -> tf.Tensor:
     """
     mask = tf.cast(lab != 0, dtype=tf.float32)
     cce = tf.keras.losses.SparseCategoricalCrossentropy(
-        from_logits=True,
+        from_logits=False,
         reduction="none",
     )
     loss = cce(lab, prd) * mask

@@ -11,6 +11,7 @@ def tx_func(  # noqa: PLR0913
     x: tf.Tensor,
     ctx: tf.Tensor,
     vocab_size: int,
+    seq_len: int,
     n_layer: int,
     n_head: int,
     d_model: int,
@@ -22,27 +23,30 @@ def tx_func(  # noqa: PLR0913
     """Transformer Model.
 
     Args:
-        x: Input tensor (English / translated text) of shape (B, LEN_X).
-        ctx: Input tensor (Portuguese / original text) of shape (B, LEN_CTX).
-        vocab_size: Vocabulary size.
-        n_layer: Number of layers.
-        n_head: Number of heads in multi-head attention.
-        d_model: Model dimension.
-        d_mha: Multi-head attention dimension.
-        d_ff: Feed-forward dimension.
-        d_label: Label dimension (vocab_size) for output layer.
-        drop_rate: Dropout rate.
+        x (tf.Tensor): Input tensor (English / translated text) of shape
+            (B, LEN_X).
+        ctx (tf.Tensor): Input tensor (Portuguese / original text) of shape
+            (B, LEN_CTX).
+        vocab_size (int): Vocabulary size.
+        seq_len (int): Sequence length.
+        n_layer (int): Number of layers.
+        n_head (int): Number of heads in multi-head attention.
+        d_model (int): Model dimension.
+        d_mha (int): Multi-head attention dimension.
+        d_ff (int): Feed-forward dimension.
+        d_label (int): Label dimension (vocab_size) for output layer.
+        drop_rate (int): Dropout rate.
 
     Returns:
         tf.Tensor: translated (EN) text of shape (B, LEN_X, d_label).
     """
-    ctx = embedding(ctx, vocab_size, d_model)
+    ctx = embedding(ctx, vocab_size, seq_len, d_model)
     ctx = tf.keras.layers.Dropout(drop_rate)(ctx)
 
     for _ in range(n_layer):
         ctx = encoder(ctx, n_head, d_mha, d_ff, d_model, drop_rate)
 
-    x = embedding(x, vocab_size, d_model)
+    x = embedding(x, vocab_size, seq_len, d_model)
     x = tf.keras.layers.Dropout(drop_rate)(x)
 
     for _ in range(n_layer):
@@ -64,6 +68,7 @@ def get_tx_micro() -> tf.keras.Model:
         input_x,
         input_ctx,
         cfg.VOCAB,
+        cfg.SEQ_LEN,
         cfg.N_LAYER,
         cfg.N_HEAD,
         cfg.D_MODEL,
@@ -87,6 +92,7 @@ def get_tx_nano() -> tf.keras.Model:
         input_x,
         input_ctx,
         cfg.VOCAB,
+        cfg.SEQ_LEN,
         cfg.N_LAYER_NANO,
         cfg.N_HEAD_NANO,
         cfg.D_MODEL_NANO,
