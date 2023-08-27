@@ -40,7 +40,7 @@ def get_chpt_path(*, nano: bool = False) -> str:
     return os.path.join(cfg.MODELDIR, f"ckpt_tx_{suffix}")
 
 
-def lr(step: int, *, d_model: int = 512, warmup: int = 4000) -> tf.Tensor:
+def lr(step: int, *, d_model: int = 512, warmup: int = 1000) -> tf.Tensor:
     """Learning rate schedule, based on the Transformer paper.
 
     Args:
@@ -156,7 +156,7 @@ def train_tx(
         for i, (pt, en, lab) in enumerate(ds_tr):
             step = ep * BATCH_PER_EPOCH + i + 1
             train_step(tx, step, pt, en, lab)
-            LOGGER.info(f"Epoch {ep + 1:02d} Batch {i + 1:03d} "
+            LOGGER.info(f"Epoch {ep + 1:02d} Step {step + 1:04d} "
                         f"Training Loss {loss_tr.result():.4f}")
 
             # Save model every 'save_interval' batches

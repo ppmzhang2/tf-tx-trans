@@ -5,8 +5,8 @@
 Install TensorFlow 2.0 and other dependencies:
 
 ```bash
-# CUDA 12.1 + cuDNN 8.9 + Python 3.11
-conda env create -f conda-cu12-py311.yaml
+# Python 3.11
+conda env create -f conda-py311.yaml
 # Apple Silicon + Python 3.11
 conda env create -f conda-apple-py311.yaml
 ```
